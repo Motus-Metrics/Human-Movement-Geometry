@@ -1,19 +1,22 @@
 # features/feature_maker.py
+from __future__ import annotations
 import numpy as np
-from typing import List
-from my_gait_project.data_models import Step
+from typing import Dict, List, Tuple
+from scipy.signal import savgol_filter
 
-class FeatureMaker:
-    def fingerprint(self, steps: List[Step], joints: list, axes=("x","y")) -> np.ndarray:
-        ax_idx = {"x":0,"y":1}
-        rows = []
-        for s in steps:
-            parts = []
-            for j in joints:
-                if j not in s.resampled: continue
-                arr = s.resampled[j]                        # (101,2)
-                take = [ax_idx[a] for a in axes]
-                parts.append(arr[:, take].reshape(-1))
-            if parts:
-                rows.append(np.concatenate(parts))
-        return np.vstack(rows) if rows else np.empty((0, len(joints)*101*len(axes)))
+def make_step_features_xy(step_xy: np.ndarray, fps: float, use_z: bool = False) -> np.ndarray:
+    """
+    step_xy: [101, J*2]  or [101, J*3] if use_z=True
+    Returns [101, D] where D = J*(2 or 3)*2  (pos + vel)
+    """
+    vel = savgol_filter(step_xy, 7, 2, deriv=1, delta=1.0/fps, axis=0, mode="interp")
+    feat = np.concatenate([step_xy, vel], axis=1)
+    return feat
+
+def flatten_xyz(data: np.ndarray, axes: Tuple[int,...]=(0,1)) -> np.ndarray:
+    """
+    data: [T, J, D]; select axes (0:x,1:y,2:z), and flatten -> [T, J*len(axes)]
+    """
+    sel = data[:, :, list(axes)]
+    T, J, A = sel.shape
+    return sel.reshape(T, J*A)

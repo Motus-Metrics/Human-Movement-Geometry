@@ -1,5 +1,9 @@
 # features/metrics.py
 import numpy as np
+from __future__ import annotations
+from typing import List
+import numpy as np
+from .spd_geom import SPDGeom, smooth_length, avg_step_velocity, frechet_variance, symmetry_index, pairwise_dist
 
 class Metrics:
     def traj_length(self, traj_2d: np.ndarray) -> float:
