@@ -6,20 +6,25 @@ from io_pkg.pose_loader import load_factorial_json, select_joints
 from pre.preprocessor import center_on_pelvis, scale_by_leg_length, deriv_savgol
 from gait.step_detector import detect_steps_from_ankle_y, resample_step
 from features.feature_maker import flatten_xyz, make_step_features_xy
-from features.spd_geom import SPDGeom, spd_from_features, spd_sequence, smooth_length, avg_step_velocity, frechet_variance, pairwise_dist
+from features.spd_geom import SPDGeom, spd_from_features, spd_sequence, smooth_length, avg_step_velocity, \
+    frechet_variance, pairwise_dist
 from features.embedder import umap_from_distance
 
+### NOVÉ: Import funkce pro Euklidovské metriky
+from features.metrics import calculate_euclidean_metrics
+
 # --- konfigurace ---
-JOINTS_RIGHT = ["r_hip", "r_knee", "r_ankle"]   # můžeš přidat "r_toe"
-AXES_2D = (0,1)  # x,y
-USE_SEQ = True   # True: SPD sekvence → Smooth; False: 1 SPD/krok
+JOINTS_RIGHT = ["r_hip", "r_knee", "r_ankle"]  # můžeš přidat "r_toe"
+AXES_2D = (0, 1)  # x,y
+USE_SEQ = True  # True: SPD sekvence → Smooth; False: 1 SPD/krok
+
 
 def run_spd_pipeline(path_json: str):
     # 1) load
     data, names, fps = load_factorial_json(path_json, use_3d=False)
     print(f"Frames: {data.shape[0]}  | fps: {fps:.2f}  | duration: {data.shape[0] / fps:.2f}s")
 
-    # 2) center & scale
+    # 2) center and scale
     data = center_on_pelvis(data, names)
     data, scale = scale_by_leg_length(data, names)
     # 3) select joints (right leg)
@@ -50,8 +55,6 @@ def run_spd_pipeline(path_json: str):
             f"Uprav prosím aliasy nebo vyber jiný kloub pro detekci kroků."
         )
 
-    # máme index kloubu v „used_names“; teď spočítáme index sloupce y v XY
-    # (XY má tvar [T, J*len(AXES_2D)] pro axes=(x,y) -> pořadí [x0,y0,x1,y1,...])
     axis_y = 1 if len(AXES_2D) >= 2 else 0
     ankle_y_col = ankle_idx * len(AXES_2D) + axis_y
 
@@ -61,13 +64,27 @@ def run_spd_pipeline(path_json: str):
         return
 
     # 6) per-step features & SPD
-    spd_mats = []       # 1 SPD per step (for clustering/UMAP or Var_R)
-    smooth_vals = []    # per-step Smooth (if USE_SEQ)
+    spd_mats = []  # 1 SPD per step (for clustering/UMAP or Var_R)
+    smooth_vals = []  # per-step Smooth (if USE_SEQ)
     vbar_vals = []
     geom = None
 
-    for (a,b) in steps:
+    ### NOVÉ: Seznamy pro ukládání Euklidovských výsledků
+    euclid_smooth_list = []
+    euclid_v_list = []
+    euclid_var_list = []
+
+    for (a, b) in steps:
         step_xy = resample_step(XY, a, b, num=101)  # [101, J*2]
+
+        ### NOVÉ: Výpočet Euklidovských metrik pro tento konkrétní krok
+        # Používáme stejná data (step_xy) jako pro Riemanna, takže srovnání je férové
+        e_s, e_v, e_var = calculate_euclidean_metrics(step_xy)
+        euclid_smooth_list.append(e_s)
+        euclid_v_list.append(e_v)
+        euclid_var_list.append(e_var)
+
+        # --- Původní Riemannovská část ---
         feat = make_step_features_xy(step_xy, fps=fps, use_z=False)  # [101, D]
         if geom is None:
             geom = SPDGeom(dim=feat.shape[1])  # d = J*2*(pos+vel)
@@ -86,7 +103,7 @@ def run_spd_pipeline(path_json: str):
     var_r = frechet_variance(spd_mats, geom) if len(spd_mats) >= 2 else 0.0
 
     # 8) optional: UMAP map of steps
-    if len(spd_mats) >= 3:  # dřív jsi měl >=3, klidně nech; s patchem zvládne i N=3–4
+    if len(spd_mats) >= 3:
         D = pairwise_dist(spd_mats, geom)
         emb = umap_from_distance(D, n_components=2)
         print(f"UMAP embedding shape: {emb.shape}")
@@ -96,10 +113,22 @@ def run_spd_pipeline(path_json: str):
 
     # 9) print/report minimal
     print(f"Steps: {len(steps)}")
+
+    # Výpis Riemannovských metrik
     if smooth_vals:
-        print(f"Smooth (median): {np.median(smooth_vals):.3f}  |  v_bar (median): {np.median(vbar_vals):.3f}")
-    print(f"Var_R (across steps): {var_r:.3f}")
+        print(f"Riemann Smooth (median): {np.median(smooth_vals):.3f}  |  v_bar (median): {np.median(vbar_vals):.3f}")
+    print(f"Riemann Var_R (across steps): {var_r:.3f}")
+
+    # Výpis Euklidovských metrik (Medián)
+    print("-" * 30)
+    print("--- EUCLIDEAN BASELINE (Median) ---")
+    if euclid_smooth_list:
+        print(f"Euclid Smooth (Path Len): {np.median(euclid_smooth_list):.3f}")
+        print(f"Euclid v_bar (Mean Vel):  {np.median(euclid_v_list):.3f}")
+        print(f"Euclid Var (Total Var):   {np.median(euclid_var_list):.3f}")
+    print("-" * 30)
+
 
 if __name__ == "__main__":
     # přizpůsob si cestu na svoje soubory
-    run_spd_pipeline("data/run_slow_100%.json")
+    run_spd_pipeline("data/run_fast_100%.json")
