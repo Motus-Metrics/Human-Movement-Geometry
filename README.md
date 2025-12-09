@@ -9,7 +9,7 @@ This repository accompanies the research paper listed below. It serves as a **Pr
 ## Associated Publication
 * **Title:** Riemannian Manifold Representation of Human Motion: A Framework for Factorial Biomechanics Analysis
 * **Status:** Manuscript in preparation
-* **Read the Paper:** [Link to PDF in docs/ or arXiv]
+* **Read the Paper:** [https://arxiv.org/submit/7065710/view]
 
 ---
 
