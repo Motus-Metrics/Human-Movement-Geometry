@@ -102,4 +102,4 @@ def run_spd_pipeline(path_json: str):
 
 if __name__ == "__main__":
     # přizpůsob si cestu na svoje soubory
-    run_spd_pipeline("data/run_mid_100%.json")
+    run_spd_pipeline("data/run_slow_100%.json")
