@@ -86,6 +86,7 @@ The codebase is organized to separate data handling, geometric logic, and execut
 │   └── preprocessor.py     # Normalization (Pelvis centering, Scaling)
 └── io_pkg/
     └── pose_loader.py      # JSON parsing utilities
+```
 
 ## 4. Configuration
 
