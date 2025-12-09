@@ -23,7 +23,7 @@ Key capabilities:
 1. Clone the repository:
    ```bash
    git clone [https://github.com/TommiBu/Riemannian-gait-analysis](https://github.com/TommiBu/Riemannian-gait-analysis)
-   cd riemannian-gait-analysis
+   cd Riemannian-gait-analysis
 2. Install dependencies:
    pip install -r requirements.txt
 
