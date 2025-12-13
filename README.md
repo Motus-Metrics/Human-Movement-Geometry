@@ -7,7 +7,7 @@ A Python computational tool for analyzing human gait dynamics using Riemannian g
 This repository accompanies the research paper listed below. It serves as a **Proof of Concept** demonstrating that mapping biomechanical data onto a curved manifold captures efficiency metrics (stabilization at high speeds) that standard Euclidean methods miss.
 
 ## Associated Publication
-* **Title:** Riemannian Manifold Representation of Human Motion: A Framework for Factorial Biomechanics Analysis
+* **Title:** Riemannian vs. Euclidean Representation of Gait Kinematics: A Comparative Analysis
 * **Status:** Manuscript in preparation
 * **Read the Paper:** [https://doi.org/10.48550/arXiv.2512.09158]
 
