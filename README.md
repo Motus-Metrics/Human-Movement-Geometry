@@ -19,8 +19,11 @@ This repository accompanies the research paper listed below. It serves as a **Pr
 Clone the repository and install the required dependencies:
 
 ```bash
-git clone [https://github.com/TommiBu/Riemannian-gait-analysis](https://github.com/TommiBu/Riemannian-gait-analysis)
-cd Riemannian-gait-analysis
+# 1. Clone the repository
+git clone https://github.com/MotusMetrics/hmg.git
+# 2. Navigate to the directory (záleží, jak jsi repo pojmenoval)
+cd hmg
+# 3. Install dependencies
 pip install -r requirements.txt
 ```
 ### 2. Data Preparation
