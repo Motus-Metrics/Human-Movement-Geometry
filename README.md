@@ -73,4 +73,13 @@ Validate: I encourage the community to test this on bilateral data or pathologic
 The tool generates a comparison of variability trends. The results demonstrate that while Euclidean variance increases linearly with speed, Riemannian variance captures the non-linear biomechanical efficiency (stabilization) observed in sprinting.
 
 ## License
-Source Code: MIT License (Open for modification and use)
+
+This project is licensed under the **GNU General Public License v3.0 (GPLv3)**.
+
+**Open Source:** You are free to use, modify, and distribute this software, provided that any derivative work is also released as open-source under the same GPLv3 license.
+**Proprietary Use:** If you wish to use this software in a **closed-source commercial product** (without disclosing your source code), you must obtain a **Commercial License**.
+
+For commercial licensing inquiries, please contact: **Thomas Boozek** via [LinkedIn/Email].
+
+See the [LICENSE](LICENSE) file for the full text.
+
