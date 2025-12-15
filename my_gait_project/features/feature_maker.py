@@ -1,3 +1,6 @@
+Copyright (c) 2025 Thomas Boozek
+SPDX-License-Identifier: AGPL-3.0-only
+
 # features/feature_maker.py
 from __future__ import annotations
 import numpy as np
