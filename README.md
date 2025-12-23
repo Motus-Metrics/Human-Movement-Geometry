@@ -83,8 +83,5 @@ to users over a network (for example as part of a web service, API, or SaaS),
 the AGPLv3 requires that the complete corresponding source code of the running
 version be made available to those users.
 
-For use in proprietary or closed-source commercial services, a separate
-commercial license may be available. Please contact the author for details.
-
 See the `LICENSE` file for the full license text.
 
